@@ -2,7 +2,7 @@
 agp = "8.5.2"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
-coreAr = "1.44.0"
+coreAr = "1.45.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"

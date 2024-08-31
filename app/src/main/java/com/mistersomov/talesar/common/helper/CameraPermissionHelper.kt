@@ -2,7 +2,8 @@ package com.mistersomov.talesar.common.helper
 
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.net.Uri
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.core.content.ContextCompat
 
@@ -13,7 +14,7 @@ object CameraPermissionHelper {
 
     /** Check to see we have the necessary permissions for this app. */
     fun Activity.hasCameraPermission(): Boolean =
-        ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION) == PackageManager.PERMISSION_GRANTED;
+        ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION) == PERMISSION_GRANTED;
 
     /** Check to see we have the necessary permissions for this app, and ask for them if we don't. */
     fun Activity.requestCameraPermission() {
@@ -27,7 +28,7 @@ object CameraPermissionHelper {
     /** Launch Application Setting to grant permission. */
     fun Activity.launchPermissionSettings() {
         val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
-        intent.data = android.net.Uri.fromParts(PACKAGE, packageName, null)
+        intent.data = Uri.fromParts(PACKAGE, packageName, null)
         startActivity(intent)
     }
 }

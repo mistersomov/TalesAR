@@ -16,6 +16,7 @@ add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR=1)
 
 add_library(${PROJECT_NAME} SHARED
         src/main/cpp/main.cpp
+        src/main/cpp/TalesArApp.cpp
         src/main/cpp/engine/TalesArEngine.cpp
         src/main/cpp/ar/TalesArSession.cpp
         src/main/cpp/utils/Utils.cpp

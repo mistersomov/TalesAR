@@ -1,8 +1,6 @@
 #ifndef TALESAR_TALESARENGINE_HPP
 #define TALESAR_TALESARENGINE_HPP
 
-#include "logging/AndroidLog.h"
-
 #include <android/asset_manager.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
@@ -14,10 +12,10 @@
 #include <optional>
 
 namespace talesar::engine {
-    class TalesAREngine {
+    class TalesArEngine {
     public:
-        explicit TalesAREngine(AAssetManager* assetManager);
-        ~TalesAREngine();
+        explicit TalesArEngine(AAssetManager* assetManager);
+        ~TalesArEngine();
 
         void Init();
 

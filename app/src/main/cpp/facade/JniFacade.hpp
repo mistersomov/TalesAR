@@ -1,0 +1,6 @@
+#ifndef TALESAR_JNIFACADE_HPP
+#define TALESAR_JNIFACADE_HPP
+
+#include <jni.h>
+
+#endif //TALESAR_JNIFACADE_HPP

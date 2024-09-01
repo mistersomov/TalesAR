@@ -1,9 +1,8 @@
 #include <jni.h>
-
-#include "logging/AndroidLog.h"
-
 #include <game-activity/GameActivity.h>
 #include <game-text-input/gametextinput.h>
+
+#include "utils/Utils.hpp"
 
 extern "C" {
 
@@ -56,9 +55,6 @@ bool motion_event_filter_func(const GameActivityMotionEvent *motionEvent) {
  * This the main entry point for a native activity
  */
 void android_main(struct android_app *pApp) {
-    // Can be removed, useful to ensure your code is running
-    aout << "Welcome to android_main" << std::endl;
-
     // Register an event handler for Android events
     pApp->onAppCmd = handle_cmd;
 
@@ -86,7 +82,7 @@ void android_main(struct android_app *pApp) {
                     done = true;
                     break;
                 case ALOOPER_EVENT_ERROR:
-                    aout << "ALooper_pollOnce returned an error" << std::endl;
+                    LOGE("ALooper_pollOnce returned an error");
                     break;
                 case ALOOPER_POLL_CALLBACK:
                     break;

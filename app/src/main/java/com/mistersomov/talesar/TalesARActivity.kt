@@ -1,9 +1,12 @@
 package com.mistersomov.talesar
 
+import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import com.google.androidgamesdk.GameActivity
+import com.mistersomov.talesar.common.facade.JniFacade
 import com.mistersomov.talesar.common.helper.CameraPermissionHelper.hasCameraPermission
 import com.mistersomov.talesar.common.helper.CameraPermissionHelper.launchPermissionSettings
 import com.mistersomov.talesar.common.helper.CameraPermissionHelper.requestCameraPermission
@@ -11,13 +14,20 @@ import com.mistersomov.talesar.common.helper.CameraPermissionHelper.shouldShowRe
 
 class TalesARActivity : GameActivity() {
     companion object {
-        private const val LIB_NAME = "talesar"
         private const val CAMERA_PERMISSION_DENIED_TEXT =
             "Camera permission is needed to run this application"
+    }
 
-        init {
-            System.loadLibrary(LIB_NAME)
-        }
+    private var nativeApplication: Long = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        nativeApplication = JniFacade.createNativeApp(assets)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        JniFacade.onPause(nativeApplication)
     }
 
     override fun onResume() {
@@ -25,6 +35,20 @@ class TalesARActivity : GameActivity() {
         if (!hasCameraPermission()) {
             requestCameraPermission()
             return
+        }
+        try {
+            JniFacade.onResume(nativeApplication, applicationContext, this)
+        } catch (e: Exception) {
+            Log.e(TalesARActivity::class.java.simpleName, "Exception creating session", e)
+            return
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        synchronized(this) {
+            JniFacade.destroyNativeApp(nativeApplication)
+            nativeApplication = 0;
         }
     }
 

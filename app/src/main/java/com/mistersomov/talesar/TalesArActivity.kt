@@ -12,7 +12,7 @@ import com.mistersomov.talesar.common.helper.CameraPermissionHelper.launchPermis
 import com.mistersomov.talesar.common.helper.CameraPermissionHelper.requestCameraPermission
 import com.mistersomov.talesar.common.helper.CameraPermissionHelper.shouldShowRequestPermissionRationale
 
-class TalesARActivity : GameActivity() {
+class TalesArActivity : GameActivity() {
     companion object {
         private const val CAMERA_PERMISSION_DENIED_TEXT =
             "Camera permission is needed to run this application"
@@ -39,7 +39,7 @@ class TalesARActivity : GameActivity() {
         try {
             JniFacade.onResume(nativeApplication, applicationContext, this)
         } catch (e: Exception) {
-            Log.e(TalesARActivity::class.java.simpleName, "Exception creating session", e)
+            Log.e(TalesArActivity::class.java.simpleName, "Exception creating session", e)
             return
         }
     }

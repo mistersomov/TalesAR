@@ -14,7 +14,7 @@ namespace {
     JavaVM *gVm = nullptr;
 
     inline jlong jptr(talesar::TalesArApp *pApp) {
-        return reinterpret_cast<intptr_t>(pApp);
+        return reinterpret_cast<jlong>(pApp);
     }
 
     inline talesar::TalesArApp *native(jlong ptr) {
@@ -27,7 +27,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-JNI_METHOD(long, createNativeApp)
+JNI_METHOD(jlong, createNativeApp)
 (JNIEnv *env, jclass, jobject j_asset_manager) {
     AAssetManager *asset_manager = AAssetManager_fromJava(env, j_asset_manager);
     return jptr(new talesar::TalesArApp(asset_manager));
@@ -40,11 +40,11 @@ JNI_METHOD(void, destroyNativeApp)
 
 JNI_METHOD(void, onPause)
 (JNIEnv *env, jclass clazz, jlong app) {
-
+    native(app)->OnPause(env);
 }
 
 JNI_METHOD(void, onResume)
 (JNIEnv *env, jclass clazz, jlong app, jobject context, jobject activity) {
-
+    native(app)->OnResume(env, context, activity);
 }
 }

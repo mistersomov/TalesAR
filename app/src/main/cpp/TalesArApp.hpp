@@ -1,8 +1,9 @@
 #ifndef TALESAR_TALESARAPP_HPP
 #define TALESAR_TALESARAPP_HPP
 
-#include <jni.h>
 #include <android/asset_manager.h>
+
+#include "ar/TalesArSession.hpp"
 
 namespace talesar {
 
@@ -12,8 +13,12 @@ namespace talesar {
         explicit TalesArApp(AAssetManager *pAssetManager);
         ~TalesArApp();
 
+        void OnPause(JNIEnv* pEnv);
+        void OnResume(JNIEnv* pEnv, void* pContext, void* pActivity);
+
     private:
         AAssetManager *mAssetManager;
+        TalesArSession *mSession;
     };
 
 }

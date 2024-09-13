@@ -19,16 +19,15 @@
     if (!(condition)) {                                             \
         LOGE("*** AR_CALL FAILED at %s:%d", __FILE__, __LINE__);    \
         talesar::utils::ThrowJavaException(env, msg);               \
-        return ##__VA_ARGS__;                                       \
     }
 #endif
 
 namespace talesar::utils {
     /** Throw a Java exception.
-     @param env the JNIEnv.
+     @param pEnv the JNIEnv.
      @param msg the message of this exception.
      */
-    void ThrowJavaException(JNIEnv *env, const char *msg);
+    void ThrowJavaException(JNIEnv *pEnv, const char *msg);
 }
 
 #endif //TALESAR_UTILS_HPP

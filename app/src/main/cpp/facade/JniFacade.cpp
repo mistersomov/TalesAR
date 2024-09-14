@@ -28,9 +28,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 }
 
 JNI_METHOD(jlong, createNativeApp)
-(JNIEnv *env, jclass, jobject j_asset_manager) {
+(JNIEnv *env, jclass, jobject j_asset_manager, jobject context, jobject activity) {
     AAssetManager *asset_manager = AAssetManager_fromJava(env, j_asset_manager);
-    return jptr(new talesar::TalesArApp(asset_manager));
+    return jptr(new talesar::TalesArApp(asset_manager, env, context, activity));
 }
 
 JNI_METHOD(void, destroyNativeApp)
@@ -44,7 +44,7 @@ JNI_METHOD(void, onPause)
 }
 
 JNI_METHOD(void, onResume)
-(JNIEnv *env, jclass clazz, jlong app, jobject context, jobject activity) {
-    native(app)->OnResume(env, context, activity);
+(JNIEnv *env, jclass clazz, jlong app) {
+    native(app)->OnResume(env);
 }
 }

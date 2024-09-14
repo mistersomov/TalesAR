@@ -2,10 +2,14 @@
 
 namespace talesar {
 
-    TalesArApp::TalesArApp(AAssetManager *pAssetManager) : mAssetManager{pAssetManager},
-                                                           mSession{nullptr}
-    {
-
+    TalesArApp::TalesArApp(
+        AAssetManager *pAssetManager,
+        JNIEnv *pEnv,
+        void *pContext,
+        void *pActivity
+    ) : mAssetManager{pAssetManager} {
+        mSession = TalesArSession::GetInstance();
+        mSession->OnCreate(pEnv, pContext, pActivity);
     }
 
     TalesArApp::~TalesArApp() {
@@ -18,12 +22,10 @@ namespace talesar {
         }
     }
 
-    void TalesArApp::OnResume(JNIEnv* pEnv, void* pContext, void* pActivity) {
-        if (mSession == nullptr) {
-            mSession = TalesArSession::GetInstance();
-            mSession->OnCreate(pEnv, pContext, pActivity);
+    void TalesArApp::OnResume(JNIEnv* pEnv) {
+        if (mSession != nullptr) {
+            mSession->OnResume(pEnv);
         }
-        mSession->OnResume(pEnv, pContext);
     }
 
 }

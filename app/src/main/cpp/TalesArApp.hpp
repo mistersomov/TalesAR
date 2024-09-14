@@ -10,11 +10,16 @@ namespace talesar {
     class TalesArApp {
 
     public:
-        explicit TalesArApp(AAssetManager *pAssetManager);
+        explicit TalesArApp(
+            AAssetManager *pAssetManager,
+            JNIEnv *pEnv,
+            void *pContext,
+            void *pActivity
+        );
         ~TalesArApp();
 
-        void OnPause(JNIEnv* pEnv);
-        void OnResume(JNIEnv* pEnv, void* pContext, void* pActivity);
+        void OnPause(JNIEnv *pEnv);
+        void OnResume(JNIEnv *pEnv);
 
     private:
         AAssetManager *mAssetManager;

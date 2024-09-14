@@ -22,7 +22,7 @@ class TalesArActivity : GameActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        nativeApplication = JniFacade.createNativeApp(assets)
+        nativeApplication = JniFacade.createNativeApp(assets,  applicationContext, this)
     }
 
     override fun onPause() {
@@ -37,7 +37,7 @@ class TalesArActivity : GameActivity() {
             return
         }
         try {
-            JniFacade.onResume(nativeApplication, applicationContext, this)
+            JniFacade.onResume(nativeApplication)
         } catch (e: Exception) {
             Log.e(TalesArActivity::class.java.simpleName, "Exception creating session", e)
             return

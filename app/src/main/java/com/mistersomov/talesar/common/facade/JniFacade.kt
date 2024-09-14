@@ -13,7 +13,11 @@ class JniFacade {
         }
 
         @JvmStatic
-        external fun createNativeApp(assetManager: AssetManager): Long
+        external fun createNativeApp(
+            assetManager: AssetManager,
+            context: Context,
+            activity: Activity,
+        ): Long
 
         @JvmStatic
         external fun destroyNativeApp(app: Long)
@@ -22,6 +26,6 @@ class JniFacade {
         external fun onPause(app: Long)
 
         @JvmStatic
-        external fun onResume(app: Long, context: Context, activity: Activity)
+        external fun onResume(app: Long)
     }
 }

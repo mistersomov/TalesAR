@@ -19,13 +19,15 @@ namespace talesar {
 
         void OnCreate(JNIEnv *pEnv, void *pContext, void *pActivity);
         void OnPause(JNIEnv *pEnv);
-        void OnResume(JNIEnv *pEnv, void *pContext);
+        void OnResume(JNIEnv *pEnv);
 
     protected:
         TalesArSession() = default;
 
     private:
         static size_t IsArCoreSupportedAndUpToDate(JNIEnv *pEnv, void *pContext, void *pActivity);
+
+        void SetCameraConfig(JNIEnv *pEnv) const;
 
         static TalesArSession *mInstance;
         ArSession *mSession{nullptr};

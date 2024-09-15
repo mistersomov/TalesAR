@@ -3,7 +3,16 @@
 
 #include <arcore_c_api.h>
 #include <cstdint>
-#include "utils/Utils.hpp"
+
+#include "exception/Exception.hpp"
+
+#ifndef AR_CALL
+#define AR_CALL(condition, env, msg, ...)                           \
+    if (!(condition)) {                                             \
+        LOGE("*** AR_CALL FAILED at %s:%d", __FILE__, __LINE__);    \
+        talesar::exception::ThrowJavaException(env, msg);           \
+    }
+#endif
 
 namespace talesar {
     /**

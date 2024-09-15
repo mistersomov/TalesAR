@@ -1,7 +1,6 @@
-#include "Utils.hpp"
+#include "Exception.hpp"
 
-namespace talesar::utils {
-
+namespace talesar::exception {
     void ThrowJavaException(JNIEnv *pEnv, const char *msg) {
         LOGE("Throw Java exception: %s", msg);
         jclass exceptionClass = pEnv->FindClass("java/lang/RuntimeException");

@@ -11,7 +11,7 @@ The ARCore AAR library contains native shared libraries that are
 extracted before building to a temporary directory.
 */
 val arCorePath = "${projectDir}/build/arcore-native"
-val thirdPartPath = "${projectDir}/src/main/cpp/third_party"
+val thirdPartPath = "${rootDir}/third_party"
 val natives: Configuration by configurations.creating
 
 android {

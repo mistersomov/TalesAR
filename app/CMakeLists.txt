@@ -20,7 +20,7 @@ add_library(${PROJECT_NAME} SHARED
         src/main/cpp/engine/TalesArEngine.cpp
         src/main/cpp/ar/TalesArSession.cpp
         src/main/cpp/facade/JniFacade.cpp
-        src/main/cpp/utils/Utils.cpp
+        src/main/cpp/exception/Exception.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE src/main/cpp)
 target_link_libraries(${PROJECT_NAME}

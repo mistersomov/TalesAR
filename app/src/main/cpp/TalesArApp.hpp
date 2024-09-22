@@ -1,9 +1,8 @@
 #ifndef TALESAR_TALESARAPP_HPP
 #define TALESAR_TALESARAPP_HPP
 
-#include <android/asset_manager.h>
-
 #include "ar/TalesArSession.hpp"
+#include "engine/TalesArEngine.hpp"
 
 namespace talesar {
 
@@ -24,6 +23,7 @@ namespace talesar {
     private:
         AAssetManager *mAssetManager;
         TalesArSession *mSession;
+        TalesArEngine *mEngine;
     };
 
 }

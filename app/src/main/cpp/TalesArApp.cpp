@@ -10,6 +10,7 @@ namespace talesar {
     ) : mAssetManager{pAssetManager} {
         mSession = TalesArSession::GetInstance();
         mSession->OnCreate(pEnv, pContext, pActivity);
+        mEngine = new TalesArEngine(pAssetManager);
     }
 
     TalesArApp::~TalesArApp() {

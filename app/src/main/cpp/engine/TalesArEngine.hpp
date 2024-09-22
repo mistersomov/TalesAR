@@ -10,19 +10,44 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <cassert>
 
-namespace talesar::engine {
+#include "logging/Log.hpp"
+
+#define VK_CALL(func)                                                             \
+    do {                                                                          \
+        VkResult status = (func);                                                 \
+        if (VK_SUCCESS != status) {                                               \
+          LOGE("==== Vulkan error %d. File[%s], line[%d]", status,                \
+                              __FILE__, __LINE__);                                \
+          assert(false);                                                          \
+        }                                                                         \
+    } while(0)
+
+namespace talesar {
     class TalesArEngine {
     public:
         explicit TalesArEngine(AAssetManager* assetManager);
         ~TalesArEngine();
 
-        void Init();
+        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugMessengerCallback(
+            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+            VkDebugUtilsMessageTypeFlagsEXT messageType,
+            const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+            void *pUserData
+        );
 
     private:
+        bool ValidationLayersSupported();
+        std::vector<const char*> GetRequiredExtensions();
+
+        void CreateDebugMessenger();
+        void DestroyDebugMessenger();
+
         void CreateInstance();
 
     private:
+        VkDebugUtilsMessengerEXT mDebugMessenger;
         AAssetManager* mAssetManager;
         VkInstance mInstance;
     };

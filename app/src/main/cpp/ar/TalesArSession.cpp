@@ -27,8 +27,9 @@ namespace talesar {
         ArConfig_create(mSession, &config);
 
         AR_CALL(
-                ArSession_configure(mSession, config) == AR_SUCCESS, pEnv,
-                "Failed to configure ArSession")
+            ArSession_configure(mSession, config) == AR_SUCCESS, pEnv,
+            "Failed to configure ArSession"
+        )
 
         ArConfig_destroy(config);
 

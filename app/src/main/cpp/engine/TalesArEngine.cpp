@@ -17,7 +17,10 @@ namespace talesar {
     }
 
     TalesArEngine::~TalesArEngine() {
-        DestroyDebugMessenger();
+        if (VALIDATION_LAYERS_ENABLED) {
+            DestroyDebugMessenger();
+        }
+        vkDestroyInstance(mInstance, nullptr);
     }
 
     bool TalesArEngine::ValidationLayersSupported() {

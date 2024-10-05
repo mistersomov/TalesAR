@@ -11,9 +11,15 @@ namespace talesar {
     const std::string ENGINE_NAME = "TalesAREngine_Vulkan";
     const std::vector<const char*> VALIDATION_LAYERS{"VK_LAYER_KHRONOS_validation"};
 
-    TalesArEngine::TalesArEngine(AAssetManager* assetManager) : mAssetManager{assetManager} {
+    TalesArEngine::TalesArEngine(
+            JNIEnv *pEnv,
+            AAssetManager* pAssetManager
+    ) : mJniEnv{pEnv},
+        mAssetManager{pAssetManager}
+    {
         CreateInstance();
         CreateDebugMessenger();
+        CreatePhysicalDevice();
     }
 
     TalesArEngine::~TalesArEngine() {
@@ -193,5 +199,21 @@ namespace talesar {
         if (pfnDestroyDebugUtilsMessengerEXT) {
             pfnDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
         }
+    }
+
+    void TalesArEngine::CreatePhysicalDevice() {
+        uint32_t gpuCount = 0;
+
+        VK_CALL(vkEnumeratePhysicalDevices(mInstance, &gpuCount, nullptr));
+
+        if (gpuCount == 0) {
+            exception::ThrowJavaException(mJniEnv, "Failed to find GPUs with Vulkan support!");
+        }
+
+        std::vector<VkPhysicalDevice> devices(gpuCount);
+
+        VK_CALL(vkEnumeratePhysicalDevices(mInstance, &gpuCount, devices.data()));
+
+        mPhysicalDevice = devices[0];
     }
 }

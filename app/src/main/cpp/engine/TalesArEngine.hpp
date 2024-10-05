@@ -12,7 +12,7 @@
 #include <optional>
 #include <cassert>
 
-#include "logging/Log.hpp"
+#include "exception/Exception.hpp"
 
 #define VK_CALL(func)                                                             \
     do {                                                                          \
@@ -27,7 +27,7 @@
 namespace talesar {
     class TalesArEngine {
     public:
-        explicit TalesArEngine(AAssetManager* assetManager);
+        explicit TalesArEngine(JNIEnv *pEnv, AAssetManager* pAssetManager);
         ~TalesArEngine();
 
         static VKAPI_ATTR VkBool32 VKAPI_CALL DebugMessengerCallback(
@@ -45,11 +45,16 @@ namespace talesar {
         void DestroyDebugMessenger();
 
         void CreateInstance();
+        void CreatePhysicalDevice();
 
     private:
-        VkDebugUtilsMessengerEXT mDebugMessenger;
+        JNIEnv* mJniEnv;
         AAssetManager* mAssetManager;
+
+        VkDebugUtilsMessengerEXT mDebugMessenger;
+
         VkInstance mInstance;
+        VkPhysicalDevice mPhysicalDevice{VK_NULL_HANDLE};
     };
 }
 

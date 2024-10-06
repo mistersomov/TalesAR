@@ -18,8 +18,12 @@
     do {                                                                          \
         VkResult status = (func);                                                 \
         if (VK_SUCCESS != status) {                                               \
-          LOGE("==== Vulkan error %d. File[%s], line[%d]", status,                \
-                              __FILE__, __LINE__);                                \
+          LOGE(                                                                   \
+                "==== Vulkan error %d. File[%s], line[%d]",                       \
+                status,                                                           \
+                __FILE__,                                                         \
+                __LINE__                                                          \
+          );                                                                      \
           assert(false);                                                          \
         }                                                                         \
     } while(0)
@@ -47,6 +51,7 @@ namespace talesar {
         void CreateInstance();
         void CreatePhysicalDevice();
         void SetQueueFamilyIndex();
+        void CreateLogicalDevice();
 
     private:
         JNIEnv* mJniEnv;
@@ -57,6 +62,8 @@ namespace talesar {
         VkInstance mInstance;
         VkPhysicalDevice mPhysicalDevice{VK_NULL_HANDLE};
         uint32_t mQueueFamilyIndex{UINT32_MAX};
+        VkDevice mLogicalDevice{VK_NULL_HANDLE};
+        VkQueue mGraphicsQueue{VK_NULL_HANDLE};
     };
 }
 

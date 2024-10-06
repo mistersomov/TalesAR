@@ -20,6 +20,7 @@ namespace talesar {
         CreateInstance();
         CreateDebugMessenger();
         CreatePhysicalDevice();
+        SetQueueFamilyIndex();
     }
 
     TalesArEngine::~TalesArEngine() {
@@ -215,5 +216,31 @@ namespace talesar {
         VK_CALL(vkEnumeratePhysicalDevices(mInstance, &gpuCount, devices.data()));
 
         mPhysicalDevice = devices[0];
+    }
+
+    void TalesArEngine::SetQueueFamilyIndex() {
+        uint32_t queueFamilyCount;
+
+        vkGetPhysicalDeviceQueueFamilyProperties(mPhysicalDevice, &queueFamilyCount, nullptr);
+
+        if (queueFamilyCount == 0) {
+            exception::ThrowJavaException(mJniEnv, "No queue families found.");
+        }
+
+        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(
+            mPhysicalDevice,
+            &queueFamilyCount,
+            queueFamilies.data()
+        );
+        for (auto i = 0; i != queueFamilyCount; ++i) {
+            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                mQueueFamilyIndex = i;
+                break;
+            }
+        }
+        if (mQueueFamilyIndex == UINT32_MAX) {
+            exception::ThrowJavaException(mJniEnv, "No graphics queue family found.");
+        }
     }
 }

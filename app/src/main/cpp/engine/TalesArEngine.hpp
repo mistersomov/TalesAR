@@ -46,6 +46,7 @@ namespace talesar {
 
         void CreateInstance();
         void CreatePhysicalDevice();
+        void SetQueueFamilyIndex();
 
     private:
         JNIEnv* mJniEnv;
@@ -55,6 +56,7 @@ namespace talesar {
 
         VkInstance mInstance;
         VkPhysicalDevice mPhysicalDevice{VK_NULL_HANDLE};
+        uint32_t mQueueFamilyIndex{UINT32_MAX};
     };
 }
 

@@ -21,9 +21,11 @@ namespace talesar {
         CreateDebugMessenger();
         CreatePhysicalDevice();
         SetQueueFamilyIndex();
+        CreateLogicalDevice();
     }
 
     TalesArEngine::~TalesArEngine() {
+        vkDestroyDevice(mLogicalDevice, nullptr);
         if (VALIDATION_LAYERS_ENABLED) {
             DestroyDebugMessenger();
         }
@@ -79,7 +81,7 @@ namespace talesar {
             .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
             .pEngineName = ENGINE_NAME.data(),
             .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-            .apiVersion = VK_API_VERSION_1_2,
+            .apiVersion = VK_API_VERSION_1_1,
         };
         const VkInstanceCreateInfo instanceCreateInfo{
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -242,5 +244,41 @@ namespace talesar {
         if (mQueueFamilyIndex == UINT32_MAX) {
             exception::ThrowJavaException(mJniEnv, "No graphics queue family found.");
         }
+    }
+
+    void TalesArEngine::CreateLogicalDevice() {
+        std::vector<const char*> deviceExtensions;
+
+        deviceExtensions.push_back("VK_KHR_swapchain");
+        deviceExtensions.push_back("VK_KHR_sampler_ycbcr_conversion");
+        deviceExtensions.push_back("VK_KHR_maintenance1");
+        deviceExtensions.push_back("VK_KHR_bind_memory2");
+        deviceExtensions.push_back("VK_KHR_get_memory_requirements2");
+        deviceExtensions.push_back("VK_KHR_external_memory");
+        deviceExtensions.push_back("VK_EXT_queue_family_foreign");
+        deviceExtensions.push_back("VK_KHR_dedicated_allocation");
+
+        float priority = 1.0f;
+
+        const VkDeviceQueueCreateInfo queueCreateInfo{
+            .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+            .flags = 0,
+            .queueFamilyIndex = mQueueFamilyIndex,
+            .queueCount = 1,
+            .pQueuePriorities = &priority
+        };
+        const VkPhysicalDeviceFeatures deviceFeatures{};
+
+        const VkDeviceCreateInfo deviceCreateInfo{
+            .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+            .queueCreateInfoCount = 1,
+            .pQueueCreateInfos = &queueCreateInfo,
+            .enabledExtensionCount = static_cast<uint32_t >(deviceExtensions.size()),
+            .ppEnabledExtensionNames = deviceExtensions.data(),
+            .pEnabledFeatures = &deviceFeatures,
+        };
+
+        VK_CALL(vkCreateDevice(mPhysicalDevice, &deviceCreateInfo, nullptr, &mLogicalDevice));
+        vkGetDeviceQueue(mLogicalDevice, mQueueFamilyIndex, 0, &mGraphicsQueue);
     }
 }

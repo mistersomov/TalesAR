@@ -21,6 +21,7 @@ add_library(${PROJECT_NAME} SHARED
         src/main/cpp/ar/TalesArSession.cpp
         src/main/cpp/facade/JniFacade.cpp
         src/main/cpp/exception/Exception.cpp
+        src/main/cpp/utils/NativeWindowWrapper.hpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE src/main/cpp)
 target_link_libraries(${PROJECT_NAME}

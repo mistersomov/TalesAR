@@ -17,13 +17,14 @@ namespace talesar {
         );
         ~TalesArApp();
 
+        void OnSurfaceCreated(JNIEnv *pEnv, jobject surface);
         void OnPause(JNIEnv *pEnv);
         void OnResume(JNIEnv *pEnv);
 
     private:
         AAssetManager *mAssetManager;
-        TalesArSession *mSession;
-        TalesArEngine *mEngine;
+        std::unique_ptr<TalesArSession> mSession;
+        std::unique_ptr<TalesArEngine> mEngine;
     };
 
 }

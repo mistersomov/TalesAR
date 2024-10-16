@@ -2,8 +2,6 @@
 #define TALESAR_TALESARENGINE_HPP
 
 #include <android/asset_manager.h>
-#include <android/native_window.h>
-#include <android/native_window_jni.h>
 
 #include <vulkan/vulkan.h>
 
@@ -13,6 +11,7 @@
 #include <cassert>
 
 #include "exception/Exception.hpp"
+#include "utils/NativeWindowWrapper.hpp"
 
 #define VK_CALL(func)                                                             \
     do {                                                                          \
@@ -31,7 +30,11 @@
 namespace talesar {
     class TalesArEngine {
     public:
-        explicit TalesArEngine(JNIEnv *pEnv, AAssetManager* pAssetManager);
+        explicit TalesArEngine(
+            JNIEnv *pEnv,
+            AAssetManager* pAssetManager,
+            jobject surface
+        );
         ~TalesArEngine();
 
         static VKAPI_ATTR VkBool32 VKAPI_CALL DebugMessengerCallback(
@@ -49,6 +52,7 @@ namespace talesar {
         void DestroyDebugMessenger();
 
         void CreateInstance();
+        void CreateSurface();
         void CreatePhysicalDevice();
         void SetQueueFamilyIndex();
         void CreateLogicalDevice();
@@ -59,7 +63,10 @@ namespace talesar {
 
         VkDebugUtilsMessengerEXT mDebugMessenger;
 
+        NativeWindowWrapper mWindowWrapper;
+
         VkInstance mInstance;
+        VkSurfaceKHR mSurface{VK_NULL_HANDLE};
         VkPhysicalDevice mPhysicalDevice{VK_NULL_HANDLE};
         uint32_t mQueueFamilyIndex{UINT32_MAX};
         VkDevice mLogicalDevice{VK_NULL_HANDLE};

@@ -11,6 +11,12 @@ namespace talesar::exception {
      @param msg the message of this exception.
      */
     void ThrowJavaException(JNIEnv *pEnv, const char *msg);
+
+    /** Throw a NoSuchElementException.
+     @param pEnv the JNIEnv.
+     @param msg the message of this exception.
+     */
+    void ThrowJavaNoSuchElementException(JNIEnv *pEnv, const char *msg);
 }
 
 #endif //TALESAR_EXCEPTION_HPP

@@ -25,6 +25,7 @@ namespace talesar {
         CreatePhysicalDevice();
         SetQueueFamilyIndex();
         CreateLogicalDevice();
+        SetSurfaceFormat();
     }
 
     TalesArEngine::~TalesArEngine() {
@@ -293,5 +294,36 @@ namespace talesar {
 
         VK_CALL(vkCreateDevice(mPhysicalDevice, &deviceCreateInfo, nullptr, &mLogicalDevice));
         vkGetDeviceQueue(mLogicalDevice, mQueueFamilyIndex, 0, &mGraphicsQueue);
+    }
+
+    void TalesArEngine::SetSurfaceFormat() {
+        uint32_t formatCount = 0;
+
+        vkGetPhysicalDeviceSurfaceFormatsKHR(
+            mPhysicalDevice,
+            mSurface,
+            &formatCount,
+            nullptr
+        );
+        std::vector<VkSurfaceFormatKHR> formats(formatCount);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(
+            mPhysicalDevice,
+            mSurface,
+            &formatCount,
+            formats.data()
+        );
+
+        for (auto& item : formats) {
+            if (item.format == VK_FORMAT_R8G8B8A8_UNORM) {
+                mSurfaceFormat = item;
+                break;
+            }
+        }
+        if (!formats.empty()) {
+            mSurfaceFormat = formats[0];
+            LOGW("Preferred surface format not found. Using format: %d", mSurfaceFormat.format);
+        } else {
+            exception::ThrowJavaNoSuchElementException(mJniEnv, "No suitable surface format found.");
+        }
     }
 }

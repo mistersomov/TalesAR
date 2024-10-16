@@ -12,13 +12,16 @@ namespace talesar {
     const std::vector<const char*> VALIDATION_LAYERS{"VK_LAYER_KHRONOS_validation"};
 
     TalesArEngine::TalesArEngine(
-            JNIEnv *pEnv,
-            AAssetManager* pAssetManager
+        JNIEnv *pEnv,
+        AAssetManager* pAssetManager,
+        jobject surface
     ) : mJniEnv{pEnv},
-        mAssetManager{pAssetManager}
+        mAssetManager{pAssetManager},
+        mWindowWrapper{pEnv, surface}
     {
         CreateInstance();
         CreateDebugMessenger();
+        CreateSurface();
         CreatePhysicalDevice();
         SetQueueFamilyIndex();
         CreateLogicalDevice();
@@ -67,6 +70,115 @@ namespace talesar {
         return extensions;
     }
 
+    VkBool32 TalesArEngine::DebugMessengerCallback(
+            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+            VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+            const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+            void *pUserData
+    ) {
+        const char validation[] = "Validation";
+        const char performance[] = "Performance";
+        const char error[] = "ERROR";
+        const char warning[] = "WARNING";
+        const char unknownType[] = "UNKNOWN_TYPE";
+        const char unknownSeverity[] = "UNKNOWN_SEVERITY";
+        const char* typeString = unknownType;
+        const char* severityString = unknownSeverity;
+        const char* messageIdName = pCallbackData->pMessageIdName;
+        int32_t messageIdNumber = pCallbackData->messageIdNumber;
+        const char* message = pCallbackData->pMessage;
+        android_LogPriority priority = ANDROID_LOG_UNKNOWN;
+
+        if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+            severityString = error;
+            priority = ANDROID_LOG_ERROR;
+        }
+        else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+            severityString = warning;
+            priority = ANDROID_LOG_WARN;
+        }
+        if (messageTypes & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) {
+            typeString = validation;
+        }
+        else if (messageTypes & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
+            typeString = performance;
+        }
+
+        if (priority == ANDROID_LOG_ERROR) {
+            LOGE(
+                    "%s %s: [%s] Code %i : %s",
+                    typeString,
+                    severityString,
+                    messageIdName,
+                    messageIdNumber,
+                    message
+            );
+        } else {
+            LOGW(
+                    "%s %s: [%s] Code %i : %s",
+                    typeString,
+                    severityString,
+                    messageIdName,
+                    messageIdNumber,
+                    message
+            );
+        }
+
+        return VK_FALSE;
+    }
+
+    void TalesArEngine::CreateDebugMessenger() {
+        if (!VALIDATION_LAYERS_ENABLED) {
+            return;
+        }
+        auto pfnCreateDebugUtilsMessengerEXT =
+                reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
+                        vkGetInstanceProcAddr(
+                                mInstance,
+                                "vkCreateDebugUtilsMessengerEXT"
+                        )
+                );
+
+        if (pfnCreateDebugUtilsMessengerEXT) {
+            constexpr VkDebugUtilsMessageSeverityFlagsEXT kSeveritiesToLog =
+                    VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
+                    | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+            constexpr VkDebugUtilsMessageTypeFlagsEXT kMessagesToLog =
+                    VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+                    | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+                    | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            VkDebugUtilsMessengerCreateInfoEXT messengerInfo{
+                    .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+                    .pNext = nullptr,
+                    .flags = 0,
+                    .messageSeverity = kSeveritiesToLog,
+                    .messageType = kMessagesToLog,
+                    .pfnUserCallback = &DebugMessengerCallback,
+                    .pUserData = nullptr,
+            };
+
+            pfnCreateDebugUtilsMessengerEXT(
+                    mInstance,
+                    &messengerInfo,
+                    nullptr,
+                    &mDebugMessenger
+            );
+        }
+    }
+
+    void TalesArEngine::DestroyDebugMessenger() {
+        auto pfnDestroyDebugUtilsMessengerEXT =
+                reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+                        vkGetInstanceProcAddr(
+                                mInstance,
+                                "vkDestroyDebugUtilsMessengerEXT"
+                        )
+                );
+        if (pfnDestroyDebugUtilsMessengerEXT) {
+            pfnDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
+        }
+    }
+
     void TalesArEngine::CreateInstance() {
         if (VALIDATION_LAYERS_ENABLED && !ValidationLayersSupported()) {
             LOGE("Validation layers requested, but not available!");
@@ -95,113 +207,14 @@ namespace talesar {
         VK_CALL(vkCreateInstance(&instanceCreateInfo, nullptr, &mInstance));
     }
 
-    VkBool32 TalesArEngine::DebugMessengerCallback(
-        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-        VkDebugUtilsMessageTypeFlagsEXT messageTypes,
-        const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
-        void *pUserData
-    ) {
-        const char validation[]  = "Validation";
-        const char performance[] = "Performance";
-        const char error[]       = "ERROR";
-        const char warning[]     = "WARNING";
-        const char unknownType[] = "UNKNOWN_TYPE";
-        const char unknownSeverity[] = "UNKNOWN_SEVERITY";
-        const char* typeString      = unknownType;
-        const char* severityString  = unknownSeverity;
-        const char* messageIdName   = pCallbackData->pMessageIdName;
-        int32_t messageIdNumber     = pCallbackData->messageIdNumber;
-        const char* message         = pCallbackData->pMessage;
-        android_LogPriority priority = ANDROID_LOG_UNKNOWN;
+    void TalesArEngine::CreateSurface() {
+        VkAndroidSurfaceCreateInfoKHR createInfo{
+            .sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR,
+            .flags = 0,
+            .window = mWindowWrapper.GetWindow()
+        };
 
-        if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-            severityString = error;
-            priority = ANDROID_LOG_ERROR;
-        }
-        else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-            severityString = warning;
-            priority = ANDROID_LOG_WARN;
-        }
-        if (messageTypes & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) {
-            typeString = validation;
-        }
-        else if (messageTypes & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
-            typeString = performance;
-        }
-
-        if (priority == ANDROID_LOG_ERROR) {
-            LOGE(
-                "%s %s: [%s] Code %i : %s",
-                typeString,
-                severityString,
-                messageIdName,
-                messageIdNumber,
-                message
-            );
-        } else {
-            LOGW(
-                "%s %s: [%s] Code %i : %s",
-                typeString,
-                severityString,
-                messageIdName,
-                messageIdNumber,
-                message
-            );
-        }
-
-        return VK_FALSE;
-    }
-
-    void TalesArEngine::CreateDebugMessenger() {
-        if (!VALIDATION_LAYERS_ENABLED) {
-            return;
-        }
-        auto pfnCreateDebugUtilsMessengerEXT =
-            reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
-                vkGetInstanceProcAddr(
-                    mInstance,
-                    "vkCreateDebugUtilsMessengerEXT"
-                )
-            );
-
-        if (pfnCreateDebugUtilsMessengerEXT) {
-            constexpr VkDebugUtilsMessageSeverityFlagsEXT kSeveritiesToLog =
-                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
-                    | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
-            constexpr VkDebugUtilsMessageTypeFlagsEXT kMessagesToLog =
-                VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-                    | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
-                    | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-            VkDebugUtilsMessengerCreateInfoEXT messengerInfo{
-                .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-                .pNext = nullptr,
-                .flags = 0,
-                .messageSeverity = kSeveritiesToLog,
-                .messageType = kMessagesToLog,
-                .pfnUserCallback = &DebugMessengerCallback,
-                .pUserData = nullptr,
-            };
-
-            pfnCreateDebugUtilsMessengerEXT(
-                mInstance,
-                &messengerInfo,
-                nullptr,
-                &mDebugMessenger
-            );
-        }
-    }
-
-    void TalesArEngine::DestroyDebugMessenger() {
-        auto pfnDestroyDebugUtilsMessengerEXT =
-            reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
-                vkGetInstanceProcAddr(
-                    mInstance,
-                    "vkDestroyDebugUtilsMessengerEXT"
-                )
-            );
-        if (pfnDestroyDebugUtilsMessengerEXT) {
-            pfnDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
-        }
+        VK_CALL(vkCreateAndroidSurfaceKHR(mInstance, &createInfo, nullptr, &mSurface));
     }
 
     void TalesArEngine::CreatePhysicalDevice() {

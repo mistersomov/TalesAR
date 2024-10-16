@@ -3,6 +3,7 @@ package com.mistersomov.talesar.common.facade
 import android.app.Activity
 import android.content.Context
 import android.content.res.AssetManager
+import android.view.Surface
 
 class JniFacade {
     companion object {
@@ -27,5 +28,11 @@ class JniFacade {
 
         @JvmStatic
         external fun onResume(app: Long)
+
+        @JvmStatic
+        external fun onSurfaceCreated(
+            app: Long,
+            surface: Surface,
+        )
     }
 }

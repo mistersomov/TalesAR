@@ -47,4 +47,10 @@ JNI_METHOD(void, onResume)
 (JNIEnv *env, jclass clazz, jlong app) {
     native(app)->OnResume(env);
 }
+
+JNI_METHOD(void, onSurfaceCreated)
+(JNIEnv *env, jclass clazz, jlong app, jobject surface) {
+    native(app)->OnSurfaceCreated(env, surface);
+}
+
 }

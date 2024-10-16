@@ -8,23 +8,28 @@ namespace talesar {
         void *pContext,
         void *pActivity
     ) : mAssetManager{pAssetManager} {
-        mSession = TalesArSession::GetInstance();
+        mSession.reset(TalesArSession::GetInstance());
         mSession->OnCreate(pEnv, pContext, pActivity);
-        mEngine = new TalesArEngine(pEnv, pAssetManager);
     }
 
     TalesArApp::~TalesArApp() {
-        delete mSession;
+
+    }
+
+    void TalesArApp::OnSurfaceCreated(JNIEnv *pEnv, jobject surface) {
+        if (mAssetManager) {
+            mEngine.reset(new TalesArEngine(pEnv, mAssetManager, surface));
+        }
     }
 
     void TalesArApp::OnPause(JNIEnv *pEnv) {
-        if (mSession != nullptr) {
+        if (mSession) {
             mSession->OnPause(pEnv);
         }
     }
 
     void TalesArApp::OnResume(JNIEnv* pEnv) {
-        if (mSession != nullptr) {
+        if (mSession) {
             mSession->OnResume(pEnv);
         }
     }

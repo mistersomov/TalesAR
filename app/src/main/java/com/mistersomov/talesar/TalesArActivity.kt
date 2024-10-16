@@ -2,6 +2,7 @@ package com.mistersomov.talesar
 
 import android.os.Bundle
 import android.util.Log
+import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
@@ -22,12 +23,24 @@ class TalesArActivity : GameActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        nativeApplication = JniFacade.createNativeApp(assets,  applicationContext, this)
+        nativeApplication = JniFacade.createNativeApp(
+            assetManager = assets,
+            context = applicationContext,
+            activity = this,
+        )
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        super.surfaceCreated(holder)
+        JniFacade.onSurfaceCreated(
+            app = nativeApplication,
+            surface = holder.surface,
+        )
     }
 
     override fun onPause() {
         super.onPause()
-        JniFacade.onPause(nativeApplication)
+        JniFacade.onPause(app = nativeApplication)
     }
 
     override fun onResume() {
@@ -37,7 +50,7 @@ class TalesArActivity : GameActivity() {
             return
         }
         try {
-            JniFacade.onResume(nativeApplication)
+            JniFacade.onResume(app = nativeApplication)
         } catch (e: Exception) {
             Log.e(TalesArActivity::class.java.simpleName, "Exception creating session", e)
             return
@@ -47,7 +60,7 @@ class TalesArActivity : GameActivity() {
     override fun onDestroy() {
         super.onDestroy()
         synchronized(this) {
-            JniFacade.destroyNativeApp(nativeApplication)
+            JniFacade.destroyNativeApp(app = nativeApplication)
             nativeApplication = 0;
         }
     }
@@ -55,7 +68,7 @@ class TalesArActivity : GameActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (!hasCameraPermission()) {

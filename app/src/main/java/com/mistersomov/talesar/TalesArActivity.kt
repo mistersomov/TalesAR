@@ -1,7 +1,6 @@
 package com.mistersomov.talesar
 
 import android.os.Bundle
-import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
@@ -12,6 +11,7 @@ import com.mistersomov.talesar.common.helper.CameraPermissionHelper.hasCameraPer
 import com.mistersomov.talesar.common.helper.CameraPermissionHelper.launchPermissionSettings
 import com.mistersomov.talesar.common.helper.CameraPermissionHelper.requestCameraPermission
 import com.mistersomov.talesar.common.helper.CameraPermissionHelper.shouldShowRequestPermissionRationale
+import com.mistersomov.talesar.logging.Logger
 
 class TalesArActivity : GameActivity() {
     companion object {
@@ -23,24 +23,40 @@ class TalesArActivity : GameActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        nativeApplication = JniFacade.createNativeApp(
-            assetManager = assets,
-            context = applicationContext,
-            activity = this,
-        )
+        Logger.register()
+        try {
+            nativeApplication = JniFacade.createNativeApp(
+                assetManager = assets,
+                context = applicationContext,
+                activity = this,
+            )
+        } catch (e: Exception) {
+            Logger.error(e)
+            return
+        }
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         super.surfaceCreated(holder)
-        JniFacade.onSurfaceCreated(
-            app = nativeApplication,
-            surface = holder.surface,
-        )
+        try {
+            JniFacade.onSurfaceCreated(
+                app = nativeApplication,
+                surface = holder.surface,
+            )
+        } catch (e: Exception) {
+            Logger.error(e)
+            return
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        JniFacade.onPause(app = nativeApplication)
+        try {
+            JniFacade.onPause(app = nativeApplication)
+        } catch (e: Exception) {
+            Logger.error(e)
+            return
+        }
     }
 
     override fun onResume() {
@@ -52,7 +68,7 @@ class TalesArActivity : GameActivity() {
         try {
             JniFacade.onResume(app = nativeApplication)
         } catch (e: Exception) {
-            Log.e(TalesArActivity::class.java.simpleName, "Exception creating session", e)
+            Logger.error(e)
             return
         }
     }

@@ -81,6 +81,9 @@ android {
         }
         ndkVersion = "26.1.10909125"
     }
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
 }
 
 dependencies {
@@ -88,11 +91,19 @@ dependencies {
     implementation(libs.android.ar.core)
     natives(libs.android.ar.core)
 
+    // Timber
+    implementation(libs.timber)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.games.activity)
+
+    // Test
     testImplementation(libs.junit)
+    testImplementation(platform(libs.junit5.bom))
+    testImplementation(libs.junit5)
+    testImplementation(libs.test.coroutines)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

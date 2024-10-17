@@ -25,10 +25,13 @@ namespace talesar {
         CreatePhysicalDevice();
         SetQueueFamilyIndex();
         CreateLogicalDevice();
+        SetSurfaceCapabilities();
         SetSurfaceFormat();
+        CreateSwapchain();
     }
 
     TalesArEngine::~TalesArEngine() {
+        vkDestroySwapchainKHR(mLogicalDevice, mSwapchain, nullptr);
         vkDestroyDevice(mLogicalDevice, nullptr);
         if (VALIDATION_LAYERS_ENABLED) {
             DestroyDebugMessenger();
@@ -296,6 +299,14 @@ namespace talesar {
         vkGetDeviceQueue(mLogicalDevice, mQueueFamilyIndex, 0, &mGraphicsQueue);
     }
 
+    void TalesArEngine::SetSurfaceCapabilities() {
+        VK_CALL(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+            mPhysicalDevice,
+            mSurface,
+            &mSurfaceCapabilities
+        ));
+    }
+
     void TalesArEngine::SetSurfaceFormat() {
         uint32_t formatCount = 0;
 
@@ -326,4 +337,32 @@ namespace talesar {
             exception::ThrowJavaNoSuchElementException(mJniEnv, "No suitable surface format found.");
         }
     }
+
+    void TalesArEngine::CreateSwapchain() {
+        VkSwapchainCreateInfoKHR createInfo{
+            .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+            .surface = mSurface,
+            .minImageCount =
+                std::min(
+                    mSurfaceCapabilities.minImageCount + 1,
+                    (mSurfaceCapabilities.maxImageCount > 0) ? mSurfaceCapabilities.maxImageCount : mSurfaceCapabilities.minImageCount + 1
+                ),
+            .imageFormat = mSurfaceFormat.format,
+            .imageColorSpace = mSurfaceFormat.colorSpace,
+            .imageExtent = mSurfaceCapabilities.currentExtent,
+            .imageArrayLayers = 1,
+            .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+            .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+            .queueFamilyIndexCount = 0,
+            .pQueueFamilyIndices = nullptr,
+            .preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
+            .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+            .presentMode = VK_PRESENT_MODE_FIFO_KHR,
+            .clipped = VK_TRUE,
+            .oldSwapchain = VK_NULL_HANDLE
+        };
+
+        VK_CALL(vkCreateSwapchainKHR(mLogicalDevice, &createInfo, nullptr, &mSwapchain));
+    }
+
 }

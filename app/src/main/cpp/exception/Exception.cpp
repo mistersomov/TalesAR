@@ -2,9 +2,8 @@
 
 namespace talesar::exception {
     void ThrowJavaException(JNIEnv *pEnv, const char *msg) {
-        LOGE("Throw Java exception: %s", msg);
         jclass exceptionClass = pEnv->FindClass("java/lang/RuntimeException");
-        if (!exceptionClass) {
+        if (exceptionClass != NULL) {
             pEnv->ThrowNew(exceptionClass, msg);
         }
         pEnv->DeleteLocalRef(exceptionClass);

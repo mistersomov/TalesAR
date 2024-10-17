@@ -3,16 +3,20 @@ agp = "8.5.2"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 coreAr = "1.45.0"
-junit = "4.13.2"
-junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
 material = "1.12.0"
 gamesActivity = "3.0.5"
+timber = "5.0.1"
+
+#test
+junit = "4.13.2"
+junitVersion = "1.2.1"
+junit5 = "5.11.2"
+test-coroutines = "1.8.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -20,7 +24,15 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "gamesActivity" }
 android-ar-core = { group = "com.google.ar", name = "core", version.ref = "coreAr" }
 
+#logging
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+#test
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+junit5-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit5" }
+junit5 = { group = "org.junit.jupiter", name = "junit-jupiter" }
+test-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "test-coroutines" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-

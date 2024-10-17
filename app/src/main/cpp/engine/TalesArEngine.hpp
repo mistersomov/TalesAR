@@ -56,7 +56,9 @@ namespace talesar {
         void CreatePhysicalDevice();
         void SetQueueFamilyIndex();
         void CreateLogicalDevice();
+        void SetSurfaceCapabilities();
         void SetSurfaceFormat();
+        void CreateSwapchain();
 
     private:
         JNIEnv* mJniEnv;
@@ -72,7 +74,9 @@ namespace talesar {
         uint32_t mQueueFamilyIndex{UINT32_MAX};
         VkDevice mLogicalDevice{VK_NULL_HANDLE};
         VkQueue mGraphicsQueue{VK_NULL_HANDLE};
+        VkSurfaceCapabilitiesKHR mSurfaceCapabilities;
         VkSurfaceFormatKHR mSurfaceFormat;
+        VkSwapchainKHR mSwapchain;
     };
 }
 
